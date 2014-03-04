@@ -1,0 +1,8 @@
+<RCC>
+  <qresource>
+    <file alias="diskIcon">images/diskIcon.png</file>
+    <file alias="settingsIconSm">images/spur-gear-ico-sm.png</file>
+    <file alias="distributorIcon">images/distributor.png</file>
+    <file alias="settingsIcon">images/spur-gear-icon.png</file>
+  </qresource>
+</RCC>
