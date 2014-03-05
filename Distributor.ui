@@ -773,36 +773,7 @@
      </layout>
     </item>
    </layout>
-   <zorder>selectedSourceEditBox</zorder>
-   <zorder>selectSourceButton</zorder>
-   <zorder>settingsButton</zorder>
-   <zorder>distributeButton</zorder>
-   <zorder>addDestinationButton</zorder>
-   <zorder>progressBar</zorder>
-   <zorder>destinationListView</zorder>
-   <zorder>deleteDestinationButton</zorder>
-   <zorder>label_2</zorder>
-   <zorder>horizontalSpacer</zorder>
-   <zorder>horizontalSpacer_2</zorder>
-   <zorder>horizontalSpacer_3</zorder>
-   <zorder>label_3</zorder>
-   <zorder>horizontalSpacer_4</zorder>
-   <zorder>verticalSpacer</zorder>
-   <zorder>verticalSpacer_2</zorder>
-   <zorder>verticalSpacer_3</zorder>
-   <zorder>volumeListView</zorder>
-   <zorder>label_4</zorder>
-   <zorder>verticalSpacer_3</zorder>
-   <zorder>verticalSpacer_5</zorder>
-   <zorder>horizontalSpacer_5</zorder>
-   <zorder>horizontalSpacer_6</zorder>
-   <zorder>horizontalSpacer_7</zorder>
-   <zorder>horizontalSpacer_8</zorder>
-   <zorder>horizontalSpacer_9</zorder>
-   <zorder>horizontalSpacer_10</zorder>
    <zorder></zorder>
-   <zorder>horizontalSpacer_11</zorder>
-   <zorder>verticalSpacer_7</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -843,8 +814,8 @@
    <slot>on_destinationFolderItemChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>676</x>
-     <y>273</y>
+     <x>904</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel">
      <x>604</x>
@@ -852,9 +823,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>volumeListView</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_volumeListItemChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>469</x>
+     <y>525</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>469</x>
+     <y>371</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_selectedSourceEditingFinished()</slot>
   <slot>on_destinationFolderItemChanged()</slot>
+  <slot>on_volumeListItemChanged()</slot>
  </slots>
 </ui>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/arana/PycharmProjects/Distributor/GetPasswordDialog.ui'
 #
-# Created: Tue Mar  4 17:05:26 2014
+# Created: Wed Mar  5 12:23:29 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!

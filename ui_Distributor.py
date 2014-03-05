@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/arana/PycharmProjects/Distributor/Distributor.ui'
 #
-# Created: Tue Mar  4 10:50:18 2014
+# Created: Wed Mar  5 12:58:08 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -312,6 +312,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QObject.connect(self.selectedSourceEditBox, QtCore.SIGNAL(_fromUtf8("editingFinished()")), MainWindow.on_selectedSourceEditingFinished)
         QtCore.QObject.connect(self.destinationListView, QtCore.SIGNAL(_fromUtf8("clicked(QModelIndex)")), MainWindow.on_destinationFolderItemChanged)
+        QtCore.QObject.connect(self.volumeListView, QtCore.SIGNAL(_fromUtf8("clicked(QModelIndex)")), MainWindow.on_volumeListItemChanged)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

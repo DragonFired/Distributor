@@ -6,6 +6,11 @@ import pickle
 import DistributorResources_rc
 from subprocess import *
 from PyQt4.QtCore import *
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    # we are using Python3 so QString is not defined
+    QString = type("")
 from PyQt4.QtGui import *
 from ui_Distributor import *
 from ui_AddDestinationDialog import *
@@ -34,7 +39,8 @@ class Distributor( QtGui.QMainWindow ):
         self.remoteServer = r"isis.newbury.edu"
         self.localDirectoryMountPoint = "~/"
         self.adminUserPassword = r"admin:remotePassSlot"
-        self.allDirectories = [self.instructorsDir, self.majorsDir, self.othersDir]
+        self.allRemoteDirectories = [self.instructorsDir, self.majorsDir, self.othersDir]
+        self.selectedRemoteDirectories = []
         self.mountCommand = r"/sbin/mount -t afp"
         self.mountCommands = []
         self.progressValue = 0
@@ -58,16 +64,19 @@ class Distributor( QtGui.QMainWindow ):
         self.ui.destinationListView.show()
 
         self.volumeItemModel = QStandardItemModel(self.ui.volumeListView)
-        for volumePath in self.allDirectories:
+        for volumePath in self.allRemoteDirectories:
             newVolumeItem = QStandardItem(volumePath)                  # Create an item with a caption
             newVolumeItem.setIcon(QIcon(":/diskIcon"))                 # Create an item with a caption
-            newVolumeItem.setCheckState(Qt.Checked)
+            if volumePath in self.selectedRemoteDirectories:
+                newVolumeItem.setCheckState(Qt.Checked)
+            else:
+                newVolumeItem.setCheckState(Qt.Unchecked)
             newVolumeItem.setCheckable(True)                           # Add a checkbox to it
             self.volumeItemModel.appendRow(newVolumeItem)              # Add the item to the model
         self.ui.volumeListView.setModel(self.volumeItemModel)
         self.ui.volumeListView.show()
 
-        for directory in self.allDirectories:
+        for directory in self.allRemoteDirectories:
             self.mountCommands.append(self.mountCommand + r" afp://" + self.adminUserPassword + "@" + self.remoteServer + "/" + directory.replace(" ", '\ ') + " " + os.path.expanduser(self.localDirectoryMountPoint) + directory.replace(" ", ''))
             self.fullDirectoryPath = self.localDirectoryMountPoint + directory.replace(' ', '')
 
@@ -81,6 +90,8 @@ class Distributor( QtGui.QMainWindow ):
         self.targetFolders.sort()
         self.destinationFolderName = pickle.load( fileHandle )
         self.selectedDestinationRow = pickle.load( fileHandle )
+        self.allRemoteDirectories = pickle.load( fileHandle )
+        self.selectedRemoteDirectories = pickle.load( fileHandle )
         self.remoteServer = pickle.load( fileHandle )
         self.localDirectoryMountPoint = pickle.load( fileHandle )
         self.adminUserPassword = pickle.load( fileHandle )
@@ -90,10 +101,11 @@ class Distributor( QtGui.QMainWindow ):
         pickle.dump( self.targetFolders, fileHandle )
         pickle.dump( self.destinationFolderName, fileHandle )
         pickle.dump( self.selectedDestinationRow, fileHandle )
+        pickle.dump( self.allRemoteDirectories, fileHandle )
+        pickle.dump( self.selectedRemoteDirectories, fileHandle )
         pickle.dump( self.remoteServer, fileHandle )
         pickle.dump( self.localDirectoryMountPoint, fileHandle )
         pickle.dump( self.adminUserPassword, fileHandle )
-
 
     def updateUI ( self ):
         self.ui.selectedSourceEditBox.setText(self.sourceFilename)
@@ -116,7 +128,7 @@ class Distributor( QtGui.QMainWindow ):
         getPasswordDialog.close()
         if destinationFolderName == "":
             return
-        for directory in self.allDirectories:
+        for directory in self.selectedRemoteDirectories:
             fullDirectoryPath = self.localDirectoryMountPoint + directory.replace(' ', '')
             child = Popen([r'/bin/mkdir ' + fullDirectoryPath], shell = True)
             stdout, stderr = child.communicate()
@@ -126,7 +138,7 @@ class Distributor( QtGui.QMainWindow ):
             child = Popen([mountCommand.replace("remotePassSlot", self.remotePassword)], shell = True)
             stdout, stderr = child.communicate()
 
-        for directory in self.allDirectories:
+        for directory in self.selectedRemoteDirectories:
             fullLocalMountPoint = os.path.expanduser(self.localDirectoryMountPoint)
             fullDirectoryPath = os.path.expanduser(self.localDirectoryMountPoint) + directory.replace(" ", '')
             try:
@@ -142,15 +154,28 @@ class Distributor( QtGui.QMainWindow ):
                             studentsList.remove(filename)
                             print("Removing file: %s" % filename)
                         else:
-                            print(filename)
+                            print("Copying %s to %s" % (self.sourceFilename, filename))
+                            if os.path.isdir(self.sourceFilename):
+                                command = 'cp -R ' + self.sourceFilename  + " " + fullDirectoryPath + "/" + filename
+                            else:
+                                command = 'chown ' + filename  + " " + fullDirectoryPath + "/" + filename
+
+                            print(command)
+                            child = Popen([command], shell = True)
+                            stdout, stderr = child.communicate()
+
+                            command = 'chown -R ' + filename  + " " + fullDirectoryPath + "/" + filename
+                            print(command)
+                            child = Popen([command], shell = True)
+                            stdout, stderr = child.communicate()
+
             except Exception as e:
                 print("Directory listing failed.\n\t", directory)
                 continue
 
-        child = Popen(['touch /Users/arana/AC008Instructors/aranafireheart/Desktop/testfile.txt'], shell = True)
-        stdout, stderr = child.communicate()
 
-        for directory in self.allDirectories:
+
+        for directory in self.selectedRemoteDirectories:
             fullDirectoryPath = os.path.expanduser(self.localDirectoryMountPoint) + directory.replace(" ", '')
             if os.path.exists(fullDirectoryPath):
                 command = '/sbin/umount ' + fullDirectoryPath
@@ -198,8 +223,10 @@ class Distributor( QtGui.QMainWindow ):
     @QtCore.pyqtSignature("")
     def on_settingsButton_clicked ( self ):
         settingsDialog = SettingsDialog()
+        settingsDialog.settingsUi.remoteServerEdit.setText(QString(self.remoteServer))
+        settingsDialog.settingsUi.localMountPointEdit.setText(QString(self.localDirectoryMountPoint))
+        settingsDialog.settingsUi.remoteAdminUserNameEdit.setText(QString(self.adminUserPassword[:self.adminUserPassword.index(":")]))
         settingsDialog.exec_()
-        settingsList = settingsDialog.getText()
         self.updateUI()
 
 
@@ -221,7 +248,14 @@ class Distributor( QtGui.QMainWindow ):
         self.destinationFolderName = "%s" % (self.destinationItemModel.item(item.row()).text())
         print(self.destinationFolderName)
 
-    def closeEvent(self, event):
+    @QtCore.pyqtSignature("")
+    def on_volumeListItemChanged(self, item):
+        if self.volumeItemModel.item(item.row()).text() in self.selectedRemoteDirectories:
+            self.selectedRemoteDirectories.remove(self.volumeItemModel.item(item.row()).text())
+        else:
+            self.selectedRemoteDirectories.append(str(self.volumeItemModel.item(item.row()).text()))
+
+    def closeEvent(self, event):                            # Runs when the application closes
         print "closing PyQtTest"
         with  open( DistributorApp.getPreferencesFilename(), "wb" ) as settingsFile:
             DistributorApp.savePreferences(settingsFile)
@@ -258,15 +292,17 @@ class SettingsDialog( QtGui.QDialog ):
         self.settingsUi = Ui_settingsDialog()
         self.settingsUi.setupUi(self)
 
+
     @QtCore.pyqtSignature("")
-    def getText ( self ):
-        self.settingsUi.remoteServerEdit.setText(DistributorApp.remoteServer)
-        self.settingsUi.localMountPointEdit.setText(DistributorApp.localDirectoryMountPoint)
-        self.settingsUi.remoteAdminUserNameEdit.setText(DistributorApp.adminUserPassword)
+    def on_okButton_clicked ( self ):
+        DistributorApp.remoteServer = str(self.settingsUi.remoteServerEdit.text())
+        DistributorApp.localDirectoryMountPoint = str(self.settingsUi.localMountPointEdit.text())
+        DistributorApp.adminUserPassword = str(self.settingsUi.remoteAdminUserNameEdit.text()) + ':remotePassSlot'
+        self.accept()
 
-        self.show()
-        return [self.settingsUi.remoteServerEdit.text(), self.settingsUi.remoteServerEdit.text(), self.settingsUi.remoteAdminUserNameEdit.text()]
-
+    @QtCore.pyqtSignature("")
+    def on_cancelButton_clicked ( self ):
+        self.close()
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)

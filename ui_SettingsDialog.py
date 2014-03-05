@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/Users/arana/PycharmProjects/Distributor/SettingsDialog.ui'
 #
-# Created: Tue Mar  4 17:04:38 2014
+# Created: Wed Mar  5 12:40:01 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -133,23 +133,23 @@ class Ui_settingsDialog(object):
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         spacerItem7 = QtGui.QSpacerItem(17, 17, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem7)
-        self.buttonBox = QtGui.QDialogButtonBox(settingsDialog)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
-        self.horizontalLayout_4.addWidget(self.buttonBox)
+        self.cancelButton = QtGui.QPushButton(settingsDialog)
+        self.cancelButton.setObjectName(_fromUtf8("cancelButton"))
+        self.horizontalLayout_4.addWidget(self.cancelButton)
+        self.okButton = QtGui.QPushButton(settingsDialog)
+        self.okButton.setObjectName(_fromUtf8("okButton"))
+        self.horizontalLayout_4.addWidget(self.okButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
 
         self.retranslateUi(settingsDialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), settingsDialog.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), settingsDialog.reject)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("clicked(QAbstractButton*)")), settingsDialog.reject)
         QtCore.QMetaObject.connectSlotsByName(settingsDialog)
 
     def retranslateUi(self, settingsDialog):
-        settingsDialog.setWindowTitle(_translate("settingsDialog", "Password Entry", None))
+        settingsDialog.setWindowTitle(_translate("settingsDialog", "Distributor Settings", None))
         self.label_4.setText(_translate("settingsDialog", "Remote Server Name:", None))
         self.label_3.setText(_translate("settingsDialog", "Local Mount Point:", None))
         self.label_2.setText(_translate("settingsDialog", "Remote Admin User Name:", None))
+        self.cancelButton.setText(_translate("settingsDialog", "Cancel", None))
+        self.okButton.setText(_translate("settingsDialog", "OK", None))
 
